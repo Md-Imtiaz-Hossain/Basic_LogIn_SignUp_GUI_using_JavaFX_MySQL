@@ -34,6 +34,10 @@ public class SignUp_SignInController  {
     @FXML
     private Button signInButton;
 
+    public String storedUserName(){
+        return usernameTextField.getText();
+    }
+
     public void signUpButtonAction(ActionEvent event) throws IOException {
         Parent root_SignUp = FXMLLoader.load(getClass().getResource("SignUp.fxml"));
         Scene scene_SignUp = new Scene(root_SignUp);
@@ -51,32 +55,35 @@ public class SignUp_SignInController  {
             e.printStackTrace();
         }
     }
-    // SELECT count(1) FROM login_page.users where userName = 'hasan36';
     public void signInButtonAction(ActionEvent event) {
 
         createConnection();
-
         try{
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("  SELECT count(1) FROM login_page.users where userName = '"+ usernameTextField.getText() +"' and password = '"+ enterPasswordField.getText() +"';  ");
 
             while (resultSet.next()){
-                if (resultSet.getInt(1) == 1){
-                    System.out.println("Congratulation !! Successfully LogIn !!");
-
-                    Parent root_SignIn = null;
-                    try {
-                        root_SignIn = FXMLLoader.load(getClass().getResource("SignIn.fxml"));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Scene scene_SignIn = new Scene(root_SignIn);
-                    Stage stage_SignIn = new Stage(StageStyle.DECORATED);
-                    stage_SignIn.setScene(scene_SignIn);
-                    stage_SignIn.show();
+                if (usernameTextField.getText().isEmpty() || enterPasswordField.getText().isEmpty()){
+                    loginMassageLevel.setText("Enter Username And Password");
+                    System.out.println("Please Enter Username And Password");
                 }else {
-                    loginMassageLevel.setText("Invalid UserName or Password!!!");
-                    System.out.println("Invalid UserName or Password!!!");
+                            if (resultSet.getInt(1) == 1){
+                                System.out.println("Congratulation !! Successfully LogIn !!");
+
+                                Parent root_SignIn = null;
+                                try {
+                                    root_SignIn = FXMLLoader.load(getClass().getResource("SignIn.fxml"));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                Scene scene_SignIn = new Scene(root_SignIn);
+                                Stage stage_SignIn = new Stage(StageStyle.DECORATED);
+                                stage_SignIn.setScene(scene_SignIn);
+                                stage_SignIn.show();
+                            }else {
+                                loginMassageLevel.setText("Invalid UserName or Password!!!");
+                                System.out.println("Invalid UserName or Password!!!");
+                            }
                 }
             }
             statement.close();
@@ -84,11 +91,9 @@ public class SignUp_SignInController  {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
-
-
     }
+
+
 
     public void cancelButtonAction(ActionEvent event){
         var stage = (Stage) cancelBtn.getScene().getWindow();
